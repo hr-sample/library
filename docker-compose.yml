@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+
+  api:
+    build: ./api
+    network_mode: host
+    environment:
+      - DB_URI=postgresql://user:password@localhost:5432/dbname
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16
+    network_mode: host
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=dbname
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
+volumes:
+  db-data:
+
+
+networks:
+  new:
+  legacy:
